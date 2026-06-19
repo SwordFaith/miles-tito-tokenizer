@@ -78,6 +78,7 @@ def get_tito_tokenizer(
     tokenizer: Any,
     tokenizer_type: TITOTokenizerType | str = TITOTokenizerType.DEFAULT,
     chat_template_kwargs: dict[str, Any] | None = None,
+    assistant_start_str: str | None = None,
     allowed_append_roles: list[str] | None = None,
 ) -> TITOTokenizer:
     """Create a ``TITOTokenizer`` instance.
@@ -103,6 +104,8 @@ def get_tito_tokenizer(
         chat_template_kwargs = resolved_kwargs
 
     kwargs: dict[str, Any] = {"chat_template_kwargs": chat_template_kwargs}
+    if assistant_start_str is not None:
+        kwargs["assistant_start_str"] = assistant_start_str
     if allowed_append_roles is not None:
         kwargs["allowed_append_roles"] = allowed_append_roles
 

@@ -42,8 +42,8 @@ def load_hf_chat_template(model_id: str) -> str:
 def apply_chat_template_from_str(
     chat_template: str,
     messages: list[dict],
-    *,
     add_generation_prompt: bool = True,
+    *,
     tools: list[dict[str, Any]] | None = None,
     **kwargs,
 ) -> str:

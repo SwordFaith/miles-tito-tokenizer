@@ -18,9 +18,9 @@ def apply_chat_template(
     messages: list[dict[str, Any]],
     *,
     tokenizer: Any,
-    tokenize: bool = True,
-    add_generation_prompt: bool = True,
     tools: list[dict[str, Any]] | None = None,
+    add_generation_prompt: bool = True,
+    tokenize: bool = False,
     **kwargs: Any,
 ) -> str | list[int]:
     """Apply chat template via HF tokenizer in SGLang style.
