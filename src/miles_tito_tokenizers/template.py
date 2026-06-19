@@ -16,8 +16,8 @@ from miles_tito_tokenizers.tool_utils import extract_tool_dicts
 
 def apply_chat_template(
     messages: list[dict[str, Any]],
-    tokenizer: Any,
     *,
+    tokenizer: Any,
     tokenize: bool = True,
     add_generation_prompt: bool = True,
     tools: list[dict[str, Any]] | None = None,
@@ -69,8 +69,8 @@ def apply_chat_template(
 
 def render_messages(
     messages: list[dict[str, Any]],
-    tokenizer: Any,
     *,
+    tokenizer: Any,
     add_generation_prompt: bool,
     tools: list[dict[str, Any]] | None = None,
     **kwargs: Any,
@@ -78,7 +78,7 @@ def render_messages(
     """Convenience wrapper over ``apply_chat_template`` matching ``TITOTokenizer``."""
     return apply_chat_template(
         messages,
-        tokenizer,
+        tokenizer=tokenizer,
         tokenize=False,
         add_generation_prompt=add_generation_prompt,
         tools=tools,

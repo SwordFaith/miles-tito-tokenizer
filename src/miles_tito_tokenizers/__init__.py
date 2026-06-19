@@ -22,7 +22,7 @@ from miles_tito_tokenizers.template_resolution import (
     resolve_fixed_chat_template,
     resolve_reasoning_and_tool_call_parser,
 )
-from miles_tito_tokenizers.tokenizer import TITOTokenizer
+from miles_tito_tokenizers.tokenizer import TEMPLATE_DIR, TITOTokenizer
 from miles_tito_tokenizers.tokenizer_type import TITOTokenizerType, get_tito_tokenizer
 from miles_tito_tokenizers.tool_utils import extract_tool_dicts
 
@@ -40,6 +40,7 @@ __all__ = [
     "MismatchType",
     "normalize_tool_arguments",
     "render_messages",
+    "TEMPLATE_DIR",
     "resolve_fixed_chat_template",
     "resolve_reasoning_and_tool_call_parser",
     "TITOTokenizer",
