@@ -13,9 +13,13 @@ _TEMPLATE_RELEVANT_KEYS = ("role", "content", "reasoning_content", "tool_calls")
 
 
 def _normalize_value(value: Any) -> Any:
-    """Normalize falsy sentinels that produce identical Jinja2 output."""
-    if value is None or value == []:
-        return ""
+    """Normalize falsy sentinels that produce identical Jinja2 output.
+
+    None, "" and [] are all falsy in Jinja2 and render the same way,
+    but client libraries may interchange them.
+    """
+    if value is None or value == "" or value == []:
+        return None
     return value
 
 
