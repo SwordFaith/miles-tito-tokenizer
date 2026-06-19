@@ -46,6 +46,7 @@ messages = [
 
 ids = tito.render_messages(messages, add_generation_prompt=True)
 print(ids)
+
 ```
 
 For DeepSeek models:
@@ -57,6 +58,21 @@ tito = get_tito_tokenizer(
     allowed_append_roles=["tool"],
 )
 ```
+
+## Migrating from `transformers`
+
+`miles_tito_tokenizers.apply_chat_template` mirrors
+`tokenizer.apply_chat_template(..., return_dict=False)`, which is the format
+used by SGLang and miles:
+
+| What you want | `transformers` call | `miles_tito_tokenizers` call |
+|---|---|---|
+| Rendered text | `tokenizer.apply_chat_template(messages, tokenize=False)` | `mtt.apply_chat_template(messages, tokenizer=tokenizer)` |
+| Token IDs | `tokenizer.apply_chat_template(messages, tokenize=True, return_dict=False)` | `mtt.apply_chat_template(messages, tokenizer=tokenizer, tokenize=True)` |
+| BatchEncoding | `tokenizer.apply_chat_template(messages)` | not supported by design |
+
+`apply_chat_template` takes `tokenizer` as a keyword-only argument so the
+intent is explicit.
 
 ## Supported model families
 
