@@ -4,8 +4,11 @@ Derived from miles.utils.chat_template_utils.template.
 """
 
 from __future__ import annotations
+
+import json
 from typing import Any
 
+from huggingface_hub import hf_hub_download
 from transformers.utils.chat_template_utils import render_jinja_template
 
 from miles_tito_tokenizers.message_utils import normalize_tool_arguments
@@ -15,15 +18,25 @@ from miles_tito_tokenizers.tool_utils import extract_tool_dicts
 def load_hf_chat_template(model_id: str) -> str:
     """Load an original chat template from HuggingFace (cached locally).
 
-    Falls back to the tokenizer's ``chat_template`` attribute if the file is
-    not present.
+    Handles two layouts:
+    - ``chat_template`` field in ``tokenizer_config.json`` (most models)
+    - Separate ``chat_template.jinja`` file (e.g. GLM-5)
     """
-    from transformers import AutoTokenizer
+    config_path = hf_hub_download(model_id, "tokenizer_config.json")
+    with open(config_path, encoding="utf-8") as f:
+        config = json.load(f)
+    template = config.get("chat_template", "")
+    if template:
+        if isinstance(template, list):
+            for t in template:
+                if t.get("name") == "default" or not t.get("name"):
+                    return t["template"]
+            return template[0]["template"]
+        return template
 
-    tokenizer = AutoTokenizer.from_pretrained(model_id, trust_remote_code=True)
-    if tokenizer.chat_template is not None:
-        return tokenizer.chat_template
-    raise ValueError(f"No chat_template found for {model_id}")
+    jinja_path = hf_hub_download(model_id, "chat_template.jinja")
+    with open(jinja_path, encoding="utf-8") as f:
+        return f.read()
 
 
 def apply_chat_template_from_str(
