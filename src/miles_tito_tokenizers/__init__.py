@@ -7,6 +7,7 @@ contributors and reused under the Apache License 2.0.
 from __future__ import annotations
 
 from miles_tito_tokenizers.comparator import Mismatch, MismatchType, TokenSeqComparator
+from miles_tito_tokenizers.encoders import deepseek_v32, deepseek_v4
 from miles_tito_tokenizers.message_utils import (
     assert_messages_append_only_with_allowed_role,
     message_matches,
@@ -29,6 +30,8 @@ __all__ = [
     "apply_chat_template",
     "apply_chat_template_from_str",
     "assert_messages_append_only_with_allowed_role",
+    "deepseek_v32",
+    "deepseek_v4",
     "extract_tool_dicts",
     "get_tito_tokenizer",
     "load_hf_chat_template",
