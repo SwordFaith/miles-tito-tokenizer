@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "miles-tito-tokenizers"
-version = "0.1.0"
+version = "0.1.1"
 description = "Standalone TITO (Token-In-Token-Out) tokenizers extracted from the miles project."
 readme = "README.md"
 license = { text = "Apache-2.0" }
@@ -47,10 +47,9 @@ Documentation = "https://github.com/radixark/miles-tito-tokenizers/blob/main/REA
 [tool.hatch.build.targets.wheel]
 packages = ["src/miles_tito_tokenizers"]
 
-[tool.hatch.build]
 include = [
-    "src/miles_tito_tokenizers/templates/*.jinja",
-    "src/miles_tito_tokenizers/encoders/*.py",
+    "src/miles_tito_tokenizers/**/*.py",
+    "src/miles_tito_tokenizers/**/*.jinja",
 ]
 
 [tool.pytest.ini_options]
