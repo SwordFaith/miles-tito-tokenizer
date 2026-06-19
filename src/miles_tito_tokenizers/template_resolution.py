@@ -31,15 +31,21 @@ def _resolve_tokenizer_class(
 
 
 def resolve_fixed_chat_template(
-    supported_templates: "tuple[FixedTemplateRow, ...] | TITOTokenizerType | str | type[TITOTokenizer]",
+    tito_model: "tuple[FixedTemplateRow, ...] | TITOTokenizerType | str | type[TITOTokenizer] | None" = None,
     allowed_append_roles: Iterable[str] | None = None,
+    *,
+    supported_templates: "tuple[FixedTemplateRow, ...] | TITOTokenizerType | str | type[TITOTokenizer] | None" = None,
 ) -> tuple[str | None, dict[str, Any]]:
-    """Smallest-superset lookup over *supported_templates*.
+    """Smallest-superset lookup over a family's ``SUPPORTED_TEMPLATES``.
 
-    *supported_templates* may be:
-      - a tuple of ``FixedTemplateRow`` (used directly), or
-      - a ``TITOTokenizerType``/string/class, in which case the family's
-        ``SUPPORTED_TEMPLATES`` is looked up.
+    ``tito_model`` may be:
+      - a ``TITOTokenizerType`` value,
+      - a model-family string (e.g. ``"qwen3"``),
+      - a ``TITOTokenizer`` subclass, or
+      - a tuple of ``FixedTemplateRow`` (used directly).
+
+    For backward compatibility with older mtt callers, ``supported_templates``
+    is accepted as a keyword alias for ``tito_model``.
 
     Returns ``(template_path, extra_kwargs)``:
 
@@ -47,22 +53,24 @@ def resolve_fixed_chat_template(
       when the matched row registers HF-native (kwargs-only fix).
     - ``extra_kwargs``: kwargs the caller should merge into
       ``apply_chat_template``.
-
-    Raises ``ValueError`` on equally-minimal supersets.
     """
-    if isinstance(supported_templates, tuple):
-        rows = supported_templates
+    if tito_model is None and supported_templates is None:
+        raise TypeError("resolve_fixed_chat_template() requires either tito_model or supported_templates")
+    rows_input = supported_templates if supported_templates is not None else tito_model
+
+    if isinstance(rows_input, tuple):
+        rows = rows_input
         tito_model_label = "custom"
-    elif isinstance(supported_templates, type) and issubclass(supported_templates, TITOTokenizer):
-        rows = supported_templates.SUPPORTED_TEMPLATES
-        tito_model_label = supported_templates.__name__
+    elif isinstance(rows_input, type) and issubclass(rows_input, TITOTokenizer):
+        rows = rows_input.SUPPORTED_TEMPLATES
+        tito_model_label = rows_input.__name__
     else:
         from miles_tito_tokenizers.tokenizer_type import TITOTokenizerType
 
-        if isinstance(supported_templates, str):
-            supported_templates = TITOTokenizerType(supported_templates)
-        rows = TITOTokenizerType.get_tokenizer_class(supported_templates).SUPPORTED_TEMPLATES
-        tito_model_label = supported_templates.value
+        if isinstance(rows_input, str):
+            rows_input = TITOTokenizerType(rows_input)
+        rows = rows_input.get_tokenizer_class(rows_input).SUPPORTED_TEMPLATES
+        tito_model_label = rows_input.value
 
     requested = frozenset(allowed_append_roles or {"tool"})
     invalid = requested - _VALID_ROLES
@@ -121,7 +129,7 @@ def resolve_reasoning_and_tool_call_parser(
             return user
         if user != bound:
             raise ValueError(
-                f"--{field.replace('_', '-')}={user!r} disagrees with the {field} "
+                f"--{field.replace('_', '-')}: {user!r} disagrees with the {field} "
                 f"registered for tito_model={getattr(tito_model, 'value', tito_model)!r}: {bound!r}. "
                 "The parser is bound on the TITO subclass; either pass the bound value or omit the flag."
             )

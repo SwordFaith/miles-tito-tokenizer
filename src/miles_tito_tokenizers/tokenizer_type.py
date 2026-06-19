@@ -80,7 +80,13 @@ def get_tito_tokenizer(
     chat_template_kwargs: dict[str, Any] | None = None,
     allowed_append_roles: list[str] | None = None,
 ) -> TITOTokenizer:
-    """Create a ``TITOTokenizer`` instance."""
+    """Create a ``TITOTokenizer`` instance.
+
+    When ``tokenizer_type`` is not ``default`` and the selected family has
+    ``SUPPORTED_TEMPLATES``, this function automatically resolves the smallest
+    matching fixed template and merges its ``extra_kwargs`` into
+    ``chat_template_kwargs``.  Explicit user kwargs always win on conflict.
+    """
     if tokenizer is None:
         raise ValueError("tokenizer must not be None")
     if isinstance(tokenizer_type, str):
@@ -90,7 +96,7 @@ def get_tito_tokenizer(
 
     if tokenizer_type != TITOTokenizerType.DEFAULT and cls.SUPPORTED_TEMPLATES:
         _, resolved_kwargs = resolve_fixed_chat_template(
-            cls.SUPPORTED_TEMPLATES,
+            cls,
             set(allowed_append_roles or ["tool"]),
         )
         resolved_kwargs.update(chat_template_kwargs or {})
