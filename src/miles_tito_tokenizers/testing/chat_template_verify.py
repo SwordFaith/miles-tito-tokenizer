@@ -434,6 +434,15 @@ def run_all_checks_via_tito(
 
     results: list[VerifyResult] = []
     for case in selected:
+        # TITO incremental requires a non-empty non-assistant appendix at the
+        # boundary. Trajectories that end at the assistant turn (e.g. plain
+        # [sys, user, assistant]) have no appendix to verify and are silently
+        # skipped here -- the string-based primitive still covers them at the
+        # text-prefix layer.
+        msgs = case.messages
+        n = case.pretokenized_num_message
+        if n >= len(msgs) or msgs[n].get("role") == "assistant":
+            continue
         for kwargs in kwarg_variants:
             merged = {**base_kwargs, **kwargs}
             case_name = format_case_id(case, merged)
